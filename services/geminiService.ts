@@ -1,11 +1,15 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-// Always initialize with direct access to process.env.API_KEY as per instructions.
-const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const generateCouponBackground = async (businessName: string, discountType: string): Promise<string> => {
-  const ai = getAI();
+  const apiKey = process.env.API_KEY;
+  
+  if (!apiKey) {
+    throw new Error("API Key is missing. Please set the API_KEY environment variable in your Vercel project settings (Settings > Environment Variables).");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
+  
   const prompt = `Create a high-quality, professional, and elegant background for a business discount coupon. 
     Theme: ${discountType}. Business Name: ${businessName}. 
     The style should be modern, minimalist, with vibrant but sophisticated colors. 
@@ -26,15 +30,23 @@ export const generateCouponBackground = async (businessName: string, discountTyp
       }
     });
 
-    // Iterate through all parts to find the image part as recommended by the guidelines.
     const part = response.candidates?.[0]?.content?.parts.find(p => p.inlineData);
     if (!part || !part.inlineData) {
-      throw new Error("No image data returned from Gemini");
+      throw new Error("Gemini AI failed to return image data. This may be due to safety filters or service availability.");
     }
 
     return `data:image/png;base64,${part.inlineData.data}`;
-  } catch (error) {
-    console.error("Error generating background:", error);
+  } catch (error: any) {
+    console.error("Gemini Generation Error:", error);
+    
+    // Provide user-friendly guidance for common API errors
+    if (error?.message?.includes('403')) {
+      throw new Error("Access Denied (403): Ensure your API Key is active and your billing account is in good standing.");
+    }
+    if (error?.message?.includes('429')) {
+      throw new Error("Rate Limit Exceeded (429): Please wait a moment before generating another coupon.");
+    }
+    
     throw error;
   }
 };
