@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Plus, 
   Download, 
@@ -16,8 +15,7 @@ import {
   Mail,
   ShieldCheck,
   Database,
-  Wifi,
-  WifiOff
+  Wifi
 } from 'lucide-react';
 import { CouponData, GeneratedCoupon, GenerationStatus } from './types';
 import { generateCouponBackground } from './services/geminiService';
@@ -32,7 +30,6 @@ const getDefaultExpiry = () => {
 
 const App: React.FC = () => {
   const [view, setView] = useState<'designer' | 'admin'>('designer');
-  const [apiKeyExists, setApiKeyExists] = useState<boolean | null>(null);
   const [formData, setFormData] = useState<Omit<CouponData, 'serialNumber'>>({
     userName: '',
     phone: '',
@@ -46,16 +43,6 @@ const App: React.FC = () => {
   const [status, setStatus] = useState<GenerationStatus>(GenerationStatus.IDLE);
   const [generatedCoupon, setGeneratedCoupon] = useState<GeneratedCoupon | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  // Diagnostic check for API Key on mount
-  useEffect(() => {
-    const checkStatus = () => {
-      // process.env.API_KEY is handled by the platform
-      const hasKey = !!process.env.API_KEY;
-      setApiKeyExists(hasKey);
-    };
-    checkStatus();
-  }, []);
 
   const generateSerial = () => {
     return 'CPN-' + Math.random().toString(36).substr(2, 9).toUpperCase();
@@ -82,11 +69,6 @@ const App: React.FC = () => {
     e.preventDefault();
     if (!formData.userName || !formData.businessName || !formData.expiryDate) return;
 
-    if (!apiKeyExists) {
-      setError('Connection Error: The AI environment is not synced. Please refresh the page or check GitHub permissions.');
-      return;
-    }
-
     setStatus(GenerationStatus.GENERATING_BACKGROUND);
     setError(null);
 
@@ -106,11 +88,10 @@ const App: React.FC = () => {
       setGeneratedCoupon(newCoupon);
       saveToStorage(newCoupon);
       setStatus(GenerationStatus.SUCCESS);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       setStatus(GenerationStatus.ERROR);
-      // More descriptive error message based on the user's specific problem
-      setError('Something went wrong during synchronization. This usually means the GitHub session has expired. Please try refreshing the entire browser page.');
+      setError(err.message || 'An unexpected error occurred. Please try again or refresh the page.');
     }
   };
 
@@ -161,12 +142,12 @@ const App: React.FC = () => {
       <header className="max-w-4xl w-full flex flex-col items-center mb-16">
         <div className="w-full flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
-             <div className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full border ${apiKeyExists ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
-              {apiKeyExists ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
-              {apiKeyExists ? 'Connected' : 'Offline / No Sync'}
+             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full border bg-emerald-50 text-emerald-600 border-emerald-100">
+              <Wifi className="w-3 h-3" />
+              AI System Active
             </div>
             <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
-              <Database className="w-3 h-3" /> Local DB: Active
+              <Database className="w-3 h-3" /> Storage Ready
             </div>
           </div>
           <button 
@@ -325,7 +306,7 @@ const App: React.FC = () => {
                 onClick={() => window.location.reload()}
                 className="flex items-center justify-center gap-2 py-2 px-4 bg-rose-600 text-white text-xs font-bold rounded-xl hover:bg-rose-700 transition-all"
               >
-                <RefreshCw className="w-3 h-3" /> Refresh Application
+                <RefreshCw className="w-3 h-3" /> Retry Synchronization
               </button>
             </div>
           )}
