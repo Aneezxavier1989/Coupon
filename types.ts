@@ -1,4 +1,3 @@
-
 export interface CouponData {
   userName: string;
   phone: string;
@@ -17,7 +16,7 @@ export interface GeneratedCoupon {
 
 export enum GenerationStatus {
   IDLE = 'IDLE',
-  GENERATING_BACKGROUND = 'GENERATING_BACKGROUND',
+  PROCESSING = 'PROCESSING',
   COMPOSITING = 'COMPOSITING',
   SUCCESS = 'SUCCESS',
   ERROR = 'ERROR'

@@ -16,7 +16,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { CouponData, GeneratedCoupon, GenerationStatus } from './types';
-import { generateCouponBackground } from './services/geminiService';
+import { generateBackground } from './services/backgroundService';
 import { compositeCoupon } from './utils/canvasUtils';
 import AdminPage from './AdminPage';
 
@@ -67,11 +67,14 @@ const App: React.FC = () => {
     e.preventDefault();
     if (!formData.userName || !formData.businessName || !formData.expiryDate) return;
 
-    setStatus(GenerationStatus.GENERATING_BACKGROUND);
+    setStatus(GenerationStatus.PROCESSING);
     setError(null);
 
+    // Artificial delay for smooth UI feedback
+    await new Promise(r => setTimeout(r, 800));
+
     try {
-      const backgroundUrl = await generateCouponBackground(formData.businessName, formData.discountType);
+      const backgroundUrl = await generateBackground(formData.discountType);
       setStatus(GenerationStatus.COMPOSITING);
       
       const fullData: CouponData = {
@@ -89,7 +92,7 @@ const App: React.FC = () => {
     } catch (err: any) {
       console.error(err);
       setStatus(GenerationStatus.ERROR);
-      setError(err.message || 'An unexpected error occurred. Please try again.');
+      setError('Generation failed. Please check your data and try again.');
     }
   };
 
@@ -136,8 +139,8 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB] flex flex-col items-center py-16 px-4">
-      <header className="max-w-4xl w-full flex flex-col items-center mb-16">
+    <div className="min-h-screen bg-[#FDFCFB] flex flex-col items-center py-12 px-4">
+      <header className="max-w-4xl w-full flex flex-col items-center mb-12">
         <div className="w-full flex justify-end items-center mb-6">
           <button 
             onClick={() => setView('admin')}
@@ -153,7 +156,7 @@ const App: React.FC = () => {
           Sprit N Soul <span className="text-blue-600">Studio</span>
         </h1>
         <p className="mt-4 text-slate-500 text-xl font-medium max-w-lg text-center leading-relaxed">
-          Premium AI-driven coupon designer for sophisticated retail experiences.
+          Premium designer tool for sophisticated digital retail vouchers.
         </p>
       </header>
 
@@ -269,12 +272,12 @@ const App: React.FC = () => {
             <button
               type="submit"
               disabled={status !== GenerationStatus.IDLE && status !== GenerationStatus.ERROR && status !== GenerationStatus.SUCCESS}
-              className="w-full py-5 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white font-bold rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-slate-200 mt-4 active:scale-95"
+              className="w-full py-5 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-slate-200 mt-4 active:scale-95"
             >
-              {status === GenerationStatus.GENERATING_BACKGROUND || status === GenerationStatus.COMPOSITING ? (
+              {status === GenerationStatus.PROCESSING || status === GenerationStatus.COMPOSITING ? (
                 <>
                   <RefreshCw className="w-5 h-5 animate-spin" />
-                  Generating Masterpiece...
+                  Generating Asset...
                 </>
               ) : (
                 <>
@@ -288,7 +291,7 @@ const App: React.FC = () => {
           {error && (
             <div className="mt-6 p-5 bg-rose-50 border border-rose-100 rounded-2xl flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
               <div className="flex items-start gap-3 text-rose-600">
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                 <p className="text-sm font-bold">{error}</p>
               </div>
             </div>
@@ -322,13 +325,13 @@ const App: React.FC = () => {
                 </div>
               )}
 
-              {(status === GenerationStatus.GENERATING_BACKGROUND || status === GenerationStatus.COMPOSITING) && (
+              {(status === GenerationStatus.PROCESSING || status === GenerationStatus.COMPOSITING) && (
                 <div className="text-center px-6 space-y-6">
                   <div className="relative">
                     <RefreshCw className="w-16 h-16 text-blue-600 animate-spin mx-auto" />
                     <div className="absolute inset-0 bg-blue-400/5 rounded-full blur-2xl animate-pulse"></div>
                   </div>
-                  <p className="text-slate-900 font-bold text-xl tracking-tight">AI Asset Orchestration</p>
+                  <p className="text-slate-900 font-bold text-xl tracking-tight">Rendering Digital Masterpiece</p>
                   <div className="flex justify-center gap-1.5">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
