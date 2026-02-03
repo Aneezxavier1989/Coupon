@@ -30,8 +30,20 @@ export const generateCouponBackground = async (businessName: string, discountTyp
       }
     });
 
-    // Added optional chaining before .find() to handle cases where parts might be undefined
-    const part = response.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+    // Explicitly check for candidates to satisfy TypeScript
+    const candidates = response.candidates;
+    if (!candidates || candidates.length === 0) {
+      throw new Error("No candidates returned from Gemini AI.");
+    }
+
+    const firstCandidate = candidates[0];
+    const parts = firstCandidate.content?.parts;
+    
+    if (!parts) {
+      throw new Error("No content parts found in the response.");
+    }
+
+    const part = parts.find(p => !!p.inlineData);
     
     if (!part || !part.inlineData) {
       throw new Error("Gemini AI failed to return image data. This may be due to safety filters or service availability.");
@@ -41,7 +53,6 @@ export const generateCouponBackground = async (businessName: string, discountTyp
   } catch (error: any) {
     console.error("Gemini Generation Error:", error);
     
-    // Provide user-friendly guidance for common API errors
     if (error?.message?.includes('403')) {
       throw new Error("Access Denied (403): Ensure your API Key is active and your billing account is in good standing.");
     }
