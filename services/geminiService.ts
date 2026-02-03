@@ -30,7 +30,9 @@ export const generateCouponBackground = async (businessName: string, discountTyp
       }
     });
 
-    const part = response.candidates?.[0]?.content?.parts.find(p => p.inlineData);
+    // Added optional chaining before .find() to handle cases where parts might be undefined
+    const part = response.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+    
     if (!part || !part.inlineData) {
       throw new Error("Gemini AI failed to return image data. This may be due to safety filters or service availability.");
     }
