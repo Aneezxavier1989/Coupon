@@ -30,34 +30,36 @@ export const generateCouponBackground = async (businessName: string, discountTyp
       }
     });
 
-    // Explicitly check for candidates to satisfy TypeScript
-    const candidates = response.candidates;
-    if (!candidates || candidates.length === 0) {
-      throw new Error("No candidates returned from Gemini AI.");
+    // Check if candidates exist
+    if (!response.candidates || response.candidates.length === 0) {
+      throw new Error("The AI model did not return any results. Please try again.");
     }
 
-    const firstCandidate = candidates[0];
-    const parts = firstCandidate.content?.parts;
+    const candidate = response.candidates[0];
     
-    if (!parts) {
-      throw new Error("No content parts found in the response.");
+    // Check if content and parts exist
+    if (!candidate.content || !candidate.content.parts) {
+      throw new Error("The AI response was empty. This can happen if the prompt triggers safety filters.");
     }
 
-    const part = parts.find(p => !!p.inlineData);
-    
-    if (!part || !part.inlineData) {
-      throw new Error("Gemini AI failed to return image data. This may be due to safety filters or service availability.");
+    // Iterate through parts to find the image part (inlineData)
+    // This is the safest way to satisfy TypeScript's strict null checks
+    for (const part of candidate.content.parts) {
+      if (part.inlineData && part.inlineData.data) {
+        return `data:image/png;base64,${part.inlineData.data}`;
+      }
     }
 
-    return `data:image/png;base64,${part.inlineData.data}`;
+    throw new Error("No image data was found in the AI response.");
   } catch (error: any) {
     console.error("Gemini Generation Error:", error);
     
+    // Provide user-friendly guidance for common API errors
     if (error?.message?.includes('403')) {
-      throw new Error("Access Denied (403): Ensure your API Key is active and your billing account is in good standing.");
+      throw new Error("Access Denied (403): Please check if your API Key is valid and billing is enabled on your Google Cloud project.");
     }
     if (error?.message?.includes('429')) {
-      throw new Error("Rate Limit Exceeded (429): Please wait a moment before generating another coupon.");
+      throw new Error("Rate Limit Exceeded (429): You are sending requests too fast. Please wait 60 seconds and try again.");
     }
     
     throw error;
