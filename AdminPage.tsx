@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, 
@@ -8,58 +7,53 @@ import {
   Clock, 
   User, 
   Tag,
-  Phone,
-  RefreshCw,
   Share2,
   Database,
-  Github,
-  CheckCircle2,
   AlertCircle,
-  ExternalLink,
-  Info
+  X
 } from 'lucide-react';
+import { GeneratedCoupon } from './types';
 
 interface AdminPageProps {
   onBack: () => void;
 }
 
 const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
-  const [coupons, setCoupons] = useState<any[]>([]);
+  const [coupons, setCoupons] = useState<GeneratedCoupon[]>([]);
   const [search, setSearch] = useState('');
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [showSyncGuide, setShowSyncGuide] = useState(false);
+  const [isConfirmingReset, setIsConfirmingReset] = useState(false);
 
   const loadCoupons = () => {
-    setIsSyncing(true);
-    setTimeout(() => {
-      const data = localStorage.getItem('ai_coupons');
-      if (data) {
+    const data = localStorage.getItem('ai_coupons');
+    if (data) {
+      try {
         setCoupons(JSON.parse(data));
-      } else {
+      } catch (e) {
+        console.error("Failed to parse coupons", e);
         setCoupons([]);
       }
-      setIsSyncing(false);
-    }, 400);
+    } else {
+      setCoupons([]);
+    }
   };
 
   useEffect(() => {
     loadCoupons();
   }, []);
 
-  const handleDelete = (id: string) => {
-    const updated = coupons.filter(c => c.data.serialNumber !== id);
+  const handleDelete = (serialNumber: string) => {
+    const updated = coupons.filter(c => c.data.serialNumber !== serialNumber);
     setCoupons(updated);
     localStorage.setItem('ai_coupons', JSON.stringify(updated));
   };
 
   const handleClearAll = () => {
-    if (confirm('Permanently delete all coupon records?')) {
-      setCoupons([]);
-      localStorage.removeItem('ai_coupons');
-    }
+    setCoupons([]);
+    localStorage.removeItem('ai_coupons');
+    setIsConfirmingReset(false);
   };
 
-  const handleReshare = (coupon: any) => {
+  const handleReshare = (coupon: GeneratedCoupon) => {
     const cleanPhone = coupon.data.phone.replace(/\D/g, '');
     const message = encodeURIComponent(
       `Resending your coupon from ${coupon.data.businessName}!\n` +
@@ -96,16 +90,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
           </div>
           
           <div className="flex flex-wrap items-center gap-3">
-            <button 
-              onClick={() => setShowSyncGuide(!showSyncGuide)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all border ${
-                showSyncGuide ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              <Github className="w-4 h-4" />
-              Sync Status
-            </button>
-            <div className="h-8 w-[1px] bg-slate-200 mx-1 hidden md:block"></div>
             <div className="relative group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
               <input 
@@ -116,46 +100,32 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
                 className="w-full md:w-64 pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"
               />
             </div>
-            <button 
-              onClick={handleClearAll}
-              className="px-4 py-2.5 bg-white hover:bg-red-50 text-red-600 rounded-xl font-bold text-sm transition-colors flex items-center gap-2 border border-slate-200 hover:border-red-100"
-            >
-              <Trash2 className="w-4 h-4" /> Reset Data
-            </button>
+            
+            {isConfirmingReset ? (
+              <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2 duration-300">
+                <button 
+                  onClick={handleClearAll}
+                  className="px-4 py-2.5 bg-red-600 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-red-100 flex items-center gap-2 hover:bg-red-700 active:scale-95"
+                >
+                  Confirm Reset
+                </button>
+                <button 
+                  onClick={() => setIsConfirmingReset(false)}
+                  className="p-2.5 bg-slate-100 text-slate-500 rounded-xl hover:bg-slate-200 transition-all"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={() => setIsConfirmingReset(true)}
+                className="px-4 py-2.5 bg-white hover:bg-red-50 text-red-600 rounded-xl font-bold text-sm transition-colors flex items-center gap-2 border border-slate-200 hover:border-red-100 shadow-sm"
+              >
+                <Trash2 className="w-4 h-4" /> Reset Data
+              </button>
+            )}
           </div>
         </header>
-
-        {showSyncGuide && (
-          <div className="mb-10 p-6 bg-blue-50 border border-blue-100 rounded-3xl animate-in slide-in-from-top-4 duration-300">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-200">
-                <Info className="w-6 h-6" />
-              </div>
-              <div className="flex-grow">
-                <h3 className="text-lg font-bold text-blue-900 mb-1">GitHub Sync Pre-settings</h3>
-                <p className="text-blue-700 text-sm mb-4">Ensure your environment is correctly connected to GitHub to save changes permanently.</p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {[
-                    { label: 'Repo Permissions', desc: 'Verify Read/Write access' },
-                    { label: 'All Repositories', desc: 'Select "All" in GitHub settings' },
-                    { label: 'Cookies Enabled', desc: 'Whitelist github.com' }
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-3 bg-white/60 p-3 rounded-xl border border-blue-100">
-                      <CheckCircle2 className="w-4 h-4 text-green-500" />
-                      <div>
-                        <p className="text-xs font-bold text-blue-900 leading-none">{item.label}</p>
-                        <p className="text-[10px] text-blue-600">{item.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <button onClick={() => setShowSyncGuide(false)} className="text-blue-400 hover:text-blue-600">
-                <AlertCircle className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        )}
 
         {filteredCoupons.length === 0 ? (
           <div className="bg-white rounded-[2rem] p-24 text-center border border-slate-100 shadow-sm">
@@ -238,7 +208,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
                   <div className="pt-5 border-t border-slate-50 flex items-center justify-between">
                     <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-tight">
                       <Clock className="w-3.5 h-3.5" />
-                      {new Date(coupon.createdAt).toLocaleDateString()}
+                      {/* @ts-ignore */}
+                      {coupon.createdAt ? new Date(coupon.createdAt).toLocaleDateString() : 'Recent'}
                     </div>
                     <div className="text-[11px] font-bold text-rose-400 uppercase tracking-tight flex items-center gap-1">
                       <AlertCircle className="w-3.5 h-3.5" />

@@ -13,9 +13,7 @@ import {
   CalendarDays,
   Phone,
   Mail,
-  ShieldCheck,
-  Database,
-  Wifi
+  ShieldCheck
 } from 'lucide-react';
 import { CouponData, GeneratedCoupon, GenerationStatus } from './types';
 import { generateCouponBackground } from './services/geminiService';
@@ -91,7 +89,7 @@ const App: React.FC = () => {
     } catch (err: any) {
       console.error(err);
       setStatus(GenerationStatus.ERROR);
-      setError(err.message || 'An unexpected error occurred. Please try again or refresh the page.');
+      setError(err.message || 'An unexpected error occurred. Please try again.');
     }
   };
 
@@ -140,16 +138,7 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#FDFCFB] flex flex-col items-center py-16 px-4">
       <header className="max-w-4xl w-full flex flex-col items-center mb-16">
-        <div className="w-full flex justify-between items-center mb-6">
-          <div className="flex items-center gap-3">
-             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full border bg-emerald-50 text-emerald-600 border-emerald-100">
-              <Wifi className="w-3 h-3" />
-              AI System Active
-            </div>
-            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
-              <Database className="w-3 h-3" /> Storage Ready
-            </div>
-          </div>
+        <div className="w-full flex justify-end items-center mb-6">
           <button 
             onClick={() => setView('admin')}
             className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 hover:border-slate-300 text-slate-700 rounded-2xl font-bold text-xs transition-all shadow-sm hover:shadow-md active:scale-95"
@@ -302,12 +291,6 @@ const App: React.FC = () => {
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
                 <p className="text-sm font-bold">{error}</p>
               </div>
-              <button 
-                onClick={() => window.location.reload()}
-                className="flex items-center justify-center gap-2 py-2 px-4 bg-rose-600 text-white text-xs font-bold rounded-xl hover:bg-rose-700 transition-all"
-              >
-                <RefreshCw className="w-3 h-3" /> Retry Synchronization
-              </button>
             </div>
           )}
         </section>
@@ -376,14 +359,14 @@ const App: React.FC = () => {
               <div className="mt-10 grid grid-cols-2 gap-5 animate-in slide-in-from-bottom-6 duration-700">
                 <button
                   onClick={handleDownload}
-                  className="flex items-center justify-center gap-3 py-4.5 px-6 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-2xl transition-all shadow-xl shadow-slate-100 active:scale-95"
+                  className="flex items-center justify-center gap-3 py-4 px-6 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-2xl transition-all shadow-xl shadow-slate-100 active:scale-95"
                 >
                   <Download className="w-5 h-5" />
                   Save Archive
                 </button>
                 <button
                   onClick={handleWhatsAppShare}
-                  className="flex items-center justify-center gap-3 py-4.5 px-6 bg-[#25D366] hover:bg-[#1DA851] text-white font-bold rounded-2xl transition-all shadow-xl shadow-emerald-100 active:scale-95"
+                  className="flex items-center justify-center gap-3 py-4 px-6 bg-[#25D366] hover:bg-[#1DA851] text-white font-bold rounded-2xl transition-all shadow-xl shadow-emerald-100 active:scale-95"
                 >
                   <Share2 className="w-5 h-5" />
                   Deploy WhatsApp
