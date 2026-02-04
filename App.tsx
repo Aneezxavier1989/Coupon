@@ -33,7 +33,7 @@ const App: React.FC = () => {
     userName: '',
     phone: '',
     email: '',
-    businessName: 'Sprit N Soul',
+    businessName: 'Spirit N Soul',
     discountType: 'Customer Loyalty',
     discountValue: '20% DISCOUNT',
     expiryDate: getDefaultExpiry(),
@@ -116,7 +116,7 @@ const App: React.FC = () => {
     if (!generatedCoupon) return;
     const cleanPhone = generatedCoupon.data.phone.replace(/\D/g, '');
     const message = encodeURIComponent(
-      `✨ Hello ${generatedCoupon.data.userName}! Your exclusive voucher from Sprit N Soul is ready.\n\n` +
+      `✨ Hello ${generatedCoupon.data.userName}! Your exclusive voucher from Spirit N Soul is ready.\n\n` +
       `🎁 Benefit: ${generatedCoupon.data.discountValue}\n` +
       `🆔 ID: ${generatedCoupon.data.serialNumber}\n` +
       `📅 Valid Until: ${generatedCoupon.data.expiryDate}\n\n` +
@@ -133,7 +133,7 @@ const App: React.FC = () => {
       userName: '',
       phone: '',
       email: '',
-      businessName: 'Sprit N Soul',
+      businessName: 'Spirit N Soul',
       discountType: 'Customer Loyalty',
       discountValue: '20% DISCOUNT',
       expiryDate: getDefaultExpiry(),
@@ -158,7 +158,7 @@ const App: React.FC = () => {
         
         <div className="text-center pt-8">
           <h1 className="text-6xl font-extrabold text-[#1e293b] tracking-tight">
-            Sprit N Soul
+            Spirit N Soul
           </h1>
           <p className="text-[#B68D40] text-xl font-bold tracking-[0.5em] uppercase mt-4">
             Salon and Boutique
@@ -344,7 +344,7 @@ const App: React.FC = () => {
               {status === GenerationStatus.SUCCESS && generatedCoupon && (
                 <img 
                   src={generatedCoupon.dataUrl} 
-                  alt="Sprit N Soul Voucher" 
+                  alt="Spirit N Soul Voucher" 
                   className="w-full h-full object-cover animate-in fade-in zoom-in duration-700 shadow-2xl"
                 />
               )}
@@ -374,7 +374,7 @@ const App: React.FC = () => {
 
       <footer className="mt-20 text-slate-300 text-[10px] font-bold uppercase tracking-[0.5em] flex items-center gap-6">
         <span className="h-[1px] w-16 bg-slate-100"></span>
-        Sprit N Soul Salon and Boutique © 2026
+        Spirit N Soul Salon and Boutique © 2026
         <span className="h-[1px] w-16 bg-slate-100"></span>
       </footer>
     </div>

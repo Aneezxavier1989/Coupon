@@ -83,7 +83,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `sprit_n_soul_vouchers_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `spirit_n_soul_vouchers_${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -93,7 +93,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
   const handleReshare = (coupon: GeneratedCoupon) => {
     const cleanPhone = coupon.data.phone.replace(/\D/g, '');
     const message = encodeURIComponent(
-      `Resending your voucher from Sprit N Soul Salon and Boutique!\n` +
+      `Resending your voucher from Spirit N Soul Salon and Boutique!\n` +
       `Value: ${coupon.data.discountValue}\n` +
       `Voucher ID: ${coupon.data.serialNumber}`
     );
@@ -123,7 +123,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
             </button>
             <div>
               <h1 className="text-3xl font-bold text-[#1e293b] tracking-tight">Voucher Archive</h1>
-              <p className="text-slate-500 font-medium">Managing Sprit N Soul digital assets</p>
+              <p className="text-slate-500 font-medium">Managing Spirit N Soul digital assets</p>
             </div>
           </div>
           
