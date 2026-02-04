@@ -12,6 +12,7 @@ export interface CouponData {
 export interface GeneratedCoupon {
   dataUrl: string;
   data: CouponData;
+  createdAt?: string;
 }
 
 export enum GenerationStatus {

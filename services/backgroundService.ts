@@ -1,6 +1,6 @@
 /**
- * Programmatically generates a high-quality aesthetic background for coupons.
- * Uses mesh gradients and patterns to replace AI-generated backgrounds.
+ * Programmatically generates a luxury aesthetic background for coupons.
+ * Uses mesh gradients with gold and bronze highlights.
  */
 export const generateBackground = (type: string): Promise<string> => {
   return new Promise((resolve) => {
@@ -10,44 +10,62 @@ export const generateBackground = (type: string): Promise<string> => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return resolve('');
 
-    // Define color schemes based on campaign type
-    let colors = ['#3b82f6', '#1e40af', '#60a5fa']; // Default Blue
-    if (type === 'Holiday Special') colors = ['#b91c1c', '#7c2d12', '#f59e0b'];
-    if (type === 'Flash Sale') colors = ['#7c3aed', '#4c1d95', '#c084fc'];
-    if (type === 'Grand Opening') colors = ['#059669', '#064e3b', '#34d399'];
+    const BRAND_GOLD = '#B68D40';
+    const BRAND_BRONZE = '#8a6523';
+    const LUXURY_DARK = '#1a1a1a';
 
-    // Draw mesh gradient
+    // Base Luxury Background
+    let colors = [LUXURY_DARK, '#262626', BRAND_GOLD]; 
+    
+    // Slight variations for different types but maintaining luxury gold theme
+    if (type === 'Holiday Special') colors = ['#3d0a0a', '#1a0404', BRAND_GOLD];
+    if (type === 'Bridal Package') colors = ['#fffbf0', '#f5e8c7', BRAND_GOLD];
+    if (type === 'Grand Opening') colors = ['#0a1f1a', '#030a08', BRAND_GOLD];
+
+    // Draw main mesh/radial gradient
     const grad = ctx.createRadialGradient(
-      canvas.width * 0.7, canvas.height * 0.2, 0,
-      canvas.width * 0.7, canvas.height * 0.2, canvas.width
+      canvas.width * 0.8, canvas.height * 0.2, 0,
+      canvas.width * 0.8, canvas.height * 0.2, canvas.width
     );
-    grad.addColorStop(0, colors[2]);
-    grad.addColorStop(0.5, colors[0]);
-    grad.addColorStop(1, colors[1]);
+    grad.addColorStop(0, colors[2]); // Gold accent
+    grad.addColorStop(0.6, colors[1]); // Mid tone
+    grad.addColorStop(1, colors[0]); // Base dark
 
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Add subtle grain/noise for a professional look
-    for (let i = 0; i < 5000; i++) {
+    // Add gold "shimmer" particles
+    for (let i = 0; i < 400; i++) {
       const x = Math.random() * canvas.width;
       const y = Math.random() * canvas.height;
-      const opacity = Math.random() * 0.05;
-      ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
-      ctx.fillRect(x, y, 1, 1);
+      const size = Math.random() * 2;
+      const opacity = Math.random() * 0.4;
+      ctx.fillStyle = `rgba(182, 141, 64, ${opacity})`;
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fill();
     }
 
-    // Add decorative subtle circles
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-    for (let i = 0; i < 5; i++) {
+    // Add subtle decorative arcs/swirls (reminiscent of the logo style)
+    ctx.strokeStyle = `rgba(182, 141, 64, 0.08)`;
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 8; i++) {
       ctx.beginPath();
       ctx.arc(
         Math.random() * canvas.width,
         Math.random() * canvas.height,
-        Math.random() * 300,
+        Math.random() * 500,
         0, Math.PI * 2
       );
-      ctx.fill();
+      ctx.stroke();
+    }
+
+    // Top subtle texture overlay
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.01)';
+    for (let i = 0; i < 10000; i++) {
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
+      ctx.fillRect(x, y, 1, 1);
     }
 
     resolve(canvas.toDataURL('image/png'));
